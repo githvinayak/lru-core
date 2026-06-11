@@ -23,8 +23,4 @@ where
             storage: HashMap::new(),
         }
     }
-
-    pub fn put(&mut self, key: K, value: V) {
-        self.storage.insert(key, value); // ← actually USE HashMap
-    }
 }
