@@ -24,3 +24,21 @@ where
         }
     }
 }
+
+impl<K, V> Cache<K, V> for BasicCache<K, V>
+where
+    K: Eq + Hash,
+{
+    fn put(&mut self, key: K, value: V) {
+        self.storage.insert(key, value);
+    }
+    fn get(&self, key: &K) -> Option<&V> {
+        self.storage.get(key)
+    }
+    fn remove(&mut self, key: &K) -> Option<V> {
+        self.storage.remove(key)
+    }
+    fn len(&self) -> usize {
+        self.storage.len()
+    }
+}
