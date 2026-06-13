@@ -102,4 +102,23 @@ mod tests {
         let value = cache.get(&"vini".to_string());
         assert!(value.is_none())
     }
+
+    #[test]
+    fn test_keys() {
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        cache.put("a".to_string(), 5);
+        cache.put("b".to_string(), 1);
+
+        let mut keys = cache.keys();
+        keys.sort();
+        assert_eq!(keys,vec!["a","b"])
+    }
+     fn test_values() {
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        cache.put("a".to_string(), 5);
+        cache.put("a".to_string(), 1);
+
+        let values = cache.values();
+        assert_eq!(values,vec![&5,&1])
+    }
 }
