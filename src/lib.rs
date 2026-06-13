@@ -5,6 +5,8 @@ pub trait Cache<K, V> {
     fn get(&self, key: &K) -> Option<&V>;
     fn remove(&mut self, key: &K) -> Option<V>;
     fn len(&self) -> usize;
+    fn keys(&self) -> Vec<&K>;
+    fn values(&self) -> Vec<&V>;
 }
 
 pub struct BasicCache<K, V>
@@ -40,6 +42,12 @@ where
     }
     fn len(&self) -> usize {
         self.storage.len()
+    }
+    fn keys(&self) -> Vec<&K> {
+        self.storage.keys().collect()
+    }
+    fn values(&self) -> Vec<&V> {
+        self.storage.values().collect()
     }
 }
 #[cfg(test)]
@@ -84,12 +92,12 @@ mod tests {
         cache.put("vini".to_string(), 5);
         cache.put("vini".to_string(), 1);
         let value = cache.get(&"vini".to_string()).unwrap();
-         assert_eq!(value,&1);
+        assert_eq!(value, &1);
     }
 
     #[test]
     fn test_empty_cache() {
-         let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
         assert_eq!(cache.len(), 0);
         let value = cache.get(&"vini".to_string());
         assert!(value.is_none())
