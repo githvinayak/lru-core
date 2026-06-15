@@ -1,5 +1,4 @@
 use std::{collections::HashMap, hash::Hash};
-
 pub trait Cache<K, V> {
     fn put(&mut self, key: K, value: V);
     fn get(&self, key: &K) -> Option<&V>;
@@ -9,27 +8,47 @@ pub trait Cache<K, V> {
     fn values(&self) -> Vec<&V>;
 }
 
+
+#[derive(PartialEq)]
 pub struct BasicCache<K, V>
 where
-    K: Eq + Hash,
+    K: Eq + Hash,V: std::cmp::PartialEq
 {
     storage: HashMap<K, V>,
 }
 
 impl<K, V> BasicCache<K, V>
 where
-    K: Eq + Hash,
+    K: Eq + Hash, V: std::cmp::PartialEq
 {
     pub fn new() -> Self {
         BasicCache {
             storage: HashMap::new(),
         }
     }
+
+    pub fn contains_value(&self,value:&V)->bool
+    where
+     K : PartialEq
+    {
+        self.storage.values().any(|v| v == value)
+    }
+    pub fn count_where<F>(&self,predicate:F) -> usize
+    where
+        F: Fn(&V) -> bool
+    {
+      self.storage.values().filter(|v| predicate(v)).count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        // your code
+        self.storage.is_empty()
+    }
 }
 
 impl<K, V> Cache<K, V> for BasicCache<K, V>
 where
-    K: Eq + Hash,
+    K: Eq + Hash ,V: std::cmp::PartialEq
 {
     fn put(&mut self, key: K, value: V) {
         self.storage.insert(key, value);
@@ -113,12 +132,36 @@ mod tests {
         keys.sort();
         assert_eq!(keys,vec!["a","b"])
     }
+    #[test]
      fn test_values() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
         cache.put("a".to_string(), 5);
-        cache.put("a".to_string(), 1);
+        cache.put("b".to_string(), 1);
 
         let values = cache.values();
         assert_eq!(values,vec![&5,&1])
+    }
+
+    #[test]
+    fn test_contains_value() {
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        cache.put("a".to_string(), 5);
+        cache.put("b".to_string(), 1);
+        let is_contain =  cache.contains_value(&5);
+        assert!(is_contain);
+    }
+    #[test]
+    fn test_count_where() {
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        cache.put("a".to_string(), 5);
+        cache.put("b".to_string(), 1);
+        let count =  cache.count_where(|&x| x < 5);
+        assert_eq!(count,1)
+    }
+    #[test]
+    fn test_is_empty() {
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let is_empty =  cache.is_empty();
+        assert!(is_empty)
     }
 }
