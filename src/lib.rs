@@ -17,6 +17,14 @@ where
     storage: HashMap<K, V>,
 }
 
+pub struct LoggingCache<K,V>
+where
+    K: Eq + Hash
+{
+    storage:HashMap<K,V>,
+    access_count:u32
+}
+
 impl<K, V> BasicCache<K, V>
 where
     K: Eq + Hash, V: std::cmp::PartialEq
@@ -69,6 +77,49 @@ where
         self.storage.values().collect()
     }
 }
+
+impl<K,V> LoggingCache<K,V>
+where 
+    K:Eq + Hash
+{
+    pub fn new() ->Self {
+        LoggingCache{
+            storage: HashMap::new(),
+            access_count:0
+        }
+    }
+    pub fn get_count(&self)->u32{
+        self.access_count
+    }
+}
+
+impl<K,V> Cache<K,V> for LoggingCache<K,V>
+where 
+     K:Eq + Hash
+{
+    fn get(&self, key: &K) -> Option<&V> {
+      self.access_count += 1;
+       return self.storage.get(key)
+    }
+    
+    fn put(&mut self, key: K, value: V) {
+        self.storage.insert(key, value);
+    }
+    
+    fn remove(&mut self, key: &K) -> Option<V> {
+        self.storage.remove(key)
+    }
+    fn len(&self) -> usize {
+        self.storage.len()
+    }
+    fn keys(&self) -> Vec<&K> {
+        self.storage.keys().collect()
+    }
+    fn values(&self) -> Vec<&V> {
+        self.storage.values().collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
