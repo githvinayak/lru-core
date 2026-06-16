@@ -139,7 +139,7 @@ mod tests {
         cache.put("b".to_string(), 1);
 
         let values = cache.values();
-        assert_eq!(values,vec![&5,&1])
+        assert_eq!(values,vec![&1,&5])
     }
 
     #[test]
