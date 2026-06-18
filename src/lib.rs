@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn test_put_and_get() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("vini".to_string(), 5);
+        cache.put("vini".to_string(), 5).unwrap();
         assert_eq!(cache.len(), 1);
         assert_eq!(cache.get(&"vini".to_string()), Some(&5));
     }
@@ -144,7 +144,7 @@ mod tests {
     #[test]
     fn test_remove() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("vini".to_string(), 5);
+        cache.put("vini".to_string(), 5).unwrap();
         cache.remove(&"vini".to_string());
         assert_eq!(cache.len(), 0);
     }
@@ -152,17 +152,17 @@ mod tests {
     #[test]
     fn test_len() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("vini".to_string(), 5);
-        cache.put("vinii".to_string(), 4);
-        cache.put("viniii".to_string(), 3);
+        cache.put("vini".to_string(), 5).unwrap();
+        cache.put("vinii".to_string(), 4).unwrap();
+        cache.put("viniii".to_string(), 3).unwrap();
         assert_eq!(cache.len(), 3);
     }
 
     #[test]
     fn test_overwrite() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("vini".to_string(), 5);
-        cache.put("vini".to_string(), 1);
+        cache.put("vini".to_string(), 5).unwrap();
+        cache.put("vini".to_string(), 1).unwrap();
         let value = cache.get(&"vini".to_string()).unwrap();
         assert_eq!(value, &1);
     }
@@ -178,8 +178,8 @@ mod tests {
     #[test]
     fn test_keys() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("a".to_string(), 5);
-        cache.put("b".to_string(), 1);
+        cache.put("a".to_string(), 5).unwrap();
+        cache.put("b".to_string(), 1).unwrap();
 
         let mut keys = cache.keys();
         keys.sort();
@@ -188,8 +188,8 @@ mod tests {
     #[test]
      fn test_values() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("a".to_string(), 5);
-        cache.put("b".to_string(), 1);
+        cache.put("a".to_string(), 5).unwrap();
+        cache.put("b".to_string(), 1).unwrap();
         let mut values = cache.values();
         values.sort();
         assert_eq!(values,vec![&1,&5])
@@ -198,16 +198,16 @@ mod tests {
     #[test]
     fn test_contains_value() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("a".to_string(), 5);
-        cache.put("b".to_string(), 1);
+        cache.put("a".to_string(), 5).unwrap();
+        cache.put("b".to_string(), 1).unwrap();
         let is_contain =  cache.contains_value(&5);
         assert!(is_contain);
     }
     #[test]
     fn test_count_where() {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
-        cache.put("a".to_string(), 5);
-        cache.put("b".to_string(), 1);
+        cache.put("a".to_string(), 5).unwrap();
+        cache.put("b".to_string(), 1).unwrap();
         let count =  cache.count_where(|&x| x < 5);
         assert_eq!(count,1)
     }
@@ -220,7 +220,7 @@ mod tests {
     #[test]
     fn test_logging_cache_access_count() {
         let mut cache: LoggingCache<String, i32> = LoggingCache::new();
-        cache.put(String::from("a"),4);
+        cache.put(String::from("a"),4).unwrap();
         cache.get(&"a".to_string());
         cache.get(&"a".to_string());
         cache.get(&"a".to_string());
