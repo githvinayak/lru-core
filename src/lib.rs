@@ -1,10 +1,12 @@
+pub mod errors;
+use errors::CacheError;
 use std::{collections::HashMap, hash::Hash};
 use std::cell::Cell;
 
 pub trait Cache<K, V> {
     fn put(&mut self, key: K, value: V);
     fn get(&self, key: &K) -> Option<&V>;
-    fn remove(&mut self, key: &K) -> Option<V>;
+    fn remove(&mut self, key: &K) -> Result<V, CacheError>;
     fn len(&self) -> usize;
 }
 
@@ -68,8 +70,11 @@ where
     fn get(&self, key: &K) -> Option<&V> {
         self.storage.get(key)
     }
-    fn remove(&mut self, key: &K) -> Option<V> {
-        self.storage.remove(key)
+    fn remove(&mut self, key: &K) -> Result<V, CacheError> {
+        match self.storage.remove(key){
+            Some(v)=>Ok(v),
+            None=>Err(CacheError::NotFound)
+        }
     }
     fn len(&self) -> usize {
         self.storage.len()
@@ -103,9 +108,12 @@ where
     fn put(&mut self, key: K, value: V) {
         self.storage.insert(key, value);
     }
-    
-    fn remove(&mut self, key: &K) -> Option<V> {
-        self.storage.remove(key)
+
+    fn remove(&mut self, key: &K) -> Result<V, CacheError> {
+        match self.storage.remove(key){
+            Some(v)=>Ok(v),
+            None=>Err(CacheError::NotFound)
+        }
     }
     fn len(&self) -> usize {
         self.storage.len()
