@@ -1,18 +1,16 @@
 use std::{collections::HashMap, hash::Hash};
+use std::cell::Cell;
+
 pub trait Cache<K, V> {
     fn put(&mut self, key: K, value: V);
     fn get(&self, key: &K) -> Option<&V>;
     fn remove(&mut self, key: &K) -> Option<V>;
     fn len(&self) -> usize;
-    fn keys(&self) -> Vec<&K>;
-    fn values(&self) -> Vec<&V>;
 }
 
-
-#[derive(PartialEq)]
 pub struct BasicCache<K, V>
 where
-    K: Eq + Hash,V: std::cmp::PartialEq
+    K: Eq + Hash
 {
     storage: HashMap<K, V>,
 }
@@ -22,12 +20,12 @@ where
     K: Eq + Hash
 {
     storage:HashMap<K,V>,
-    access_count:u32
+    access_count:Cell<u32>
 }
 
 impl<K, V> BasicCache<K, V>
 where
-    K: Eq + Hash, V: std::cmp::PartialEq
+    K: Eq + Hash
 {
     pub fn new() -> Self {
         BasicCache {
@@ -37,7 +35,7 @@ where
 
     pub fn contains_value(&self,value:&V)->bool
     where
-     K : PartialEq
+     V : PartialEq
     {
         self.storage.values().any(|v| v == value)
     }
@@ -52,11 +50,17 @@ where
         // your code
         self.storage.is_empty()
     }
+    fn keys(&self) -> Vec<&K> {
+        self.storage.keys().collect()
+    }
+    fn values(&self) -> Vec<&V> {
+        self.storage.values().collect()
+    }
 }
 
 impl<K, V> Cache<K, V> for BasicCache<K, V>
 where
-    K: Eq + Hash ,V: std::cmp::PartialEq
+    K: Eq + Hash
 {
     fn put(&mut self, key: K, value: V) {
         self.storage.insert(key, value);
@@ -70,12 +74,6 @@ where
     fn len(&self) -> usize {
         self.storage.len()
     }
-    fn keys(&self) -> Vec<&K> {
-        self.storage.keys().collect()
-    }
-    fn values(&self) -> Vec<&V> {
-        self.storage.values().collect()
-    }
 }
 
 impl<K,V> LoggingCache<K,V>
@@ -85,11 +83,11 @@ where
     pub fn new() ->Self {
         LoggingCache{
             storage: HashMap::new(),
-            access_count:0
+            access_count:Cell::new(0)
         }
     }
     pub fn get_count(&self)->u32{
-        self.access_count
+        self.access_count.get()
     }
 }
 
@@ -98,8 +96,8 @@ where
      K:Eq + Hash
 {
     fn get(&self, key: &K) -> Option<&V> {
-      self.access_count += 1;
-       return self.storage.get(key)
+      self.access_count.set(self.access_count.get() + 1);
+        self.storage.get(key)
     }
     
     fn put(&mut self, key: K, value: V) {
@@ -111,12 +109,6 @@ where
     }
     fn len(&self) -> usize {
         self.storage.len()
-    }
-    fn keys(&self) -> Vec<&K> {
-        self.storage.keys().collect()
-    }
-    fn values(&self) -> Vec<&V> {
-        self.storage.values().collect()
     }
 }
 
@@ -188,7 +180,6 @@ mod tests {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
         cache.put("a".to_string(), 5);
         cache.put("b".to_string(), 1);
-
         let values = cache.values();
         assert_eq!(values,vec![&1,&5])
     }
