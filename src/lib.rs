@@ -203,8 +203,17 @@ mod tests {
     }
     #[test]
     fn test_is_empty() {
-        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let cache: BasicCache<String, i32> = BasicCache::new();
         let is_empty =  cache.is_empty();
         assert!(is_empty)
+    }
+    #[test]
+    fn test_logging_cache_access_count() {
+        let mut cache: LoggingCache<String, i32> = LoggingCache::new();
+        cache.put(String::from("a"),4);
+        cache.get(&"a".to_string());
+        cache.get(&"a".to_string());
+        cache.get(&"a".to_string());
+        assert_eq!(cache.get_count(), 3);
     }
 }
