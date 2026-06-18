@@ -4,7 +4,7 @@ use std::{collections::HashMap, hash::Hash};
 use std::cell::Cell;
 
 pub trait Cache<K, V> {
-    fn put(&mut self, key: K, value: V);
+    fn put(&mut self, key: K, value: V)->Result<(),CacheError>;
     fn get(&self, key: &K) -> Option<&V>;
     fn remove(&mut self, key: &K) -> Result<V, CacheError>;
     fn len(&self) -> usize;
@@ -64,8 +64,9 @@ impl<K, V> Cache<K, V> for BasicCache<K, V>
 where
     K: Eq + Hash
 {
-    fn put(&mut self, key: K, value: V) {
-        self.storage.insert(key, value);
+    fn put(&mut self, key: K, value: V)->Result<(),CacheError> {
+       self.storage.insert(key, value);
+           Ok(())
     }
     fn get(&self, key: &K) -> Option<&V> {
         self.storage.get(key)
@@ -104,9 +105,10 @@ where
       self.access_count.set(self.access_count.get() + 1);
         self.storage.get(key)
     }
-    
-    fn put(&mut self, key: K, value: V) {
+
+    fn put(&mut self, key: K, value: V)->Result<(),CacheError> {
         self.storage.insert(key, value);
+        Ok(())
     }
 
     fn remove(&mut self, key: &K) -> Result<V, CacheError> {
