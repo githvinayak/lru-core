@@ -180,7 +180,8 @@ mod tests {
         let mut cache: BasicCache<String, i32> = BasicCache::new();
         cache.put("a".to_string(), 5);
         cache.put("b".to_string(), 1);
-        let values = cache.values();
+        let mut values = cache.values();
+        values.sort();
         assert_eq!(values,vec![&1,&5])
     }
 
