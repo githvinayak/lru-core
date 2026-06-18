@@ -45,7 +45,8 @@ where
     where
         F: Fn(&V) -> bool
     {
-      self.storage.values().filter(|v| predicate(v)).count()
+
+        self.storage.values().filter(|v| predicate(v)).count()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -57,6 +58,12 @@ where
     }
     fn values(&self) -> Vec<&V> {
         self.storage.values().collect()
+    }
+    pub fn update_all<F>(&mut self, f: F)
+    where
+        F: Fn(&mut V),
+    {
+        self.storage.iter_mut().for_each(|(k,v)| f(v));
     }
 }
 
@@ -225,5 +232,13 @@ mod tests {
         cache.get(&"a".to_string());
         cache.get(&"a".to_string());
         assert_eq!(cache.get_count(), 3);
+    }
+    #[test]
+    fn test_update_all(){
+        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let add  = |v:&mut i32| *v = *v + 5;
+        cache.put("a".to_string(), 5).unwrap();
+        cache.update_all(add);
+        assert_eq!(*cache.get(&"a".to_string()).unwrap(), 10);
     }
 }
