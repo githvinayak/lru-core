@@ -1,5 +1,5 @@
 pub mod errors;
-use errors::CacheError;
+pub use errors::CacheError;
 use std::{collections::HashMap, hash::Hash};
 use std::cell::Cell;
 
