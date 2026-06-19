@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-#[derive(Debug,Error)]
+#[derive(Debug,Error,PartialEq)]
 pub enum CacheError{
     #[error("key not found")]
     NotFound,
