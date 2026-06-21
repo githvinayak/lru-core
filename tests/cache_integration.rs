@@ -1,6 +1,5 @@
-use lru_core::BasicCache;
-use lru_core::Cache;
-
+use lru_core::cache::Cache;
+use lru_core::basic_cache::BasicCache;
 #[cfg(test)]
 mod tests{
     use super::*;
