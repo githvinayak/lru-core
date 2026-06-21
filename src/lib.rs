@@ -7,7 +7,6 @@ use cache::Cache;
 use basic_cache::BasicCache;
 use logging_cache::LoggingCache;
 use errors::CacheError;
-use std::{hash::Hash};
 
 #[cfg(test)]
 mod tests {
@@ -23,7 +22,7 @@ mod tests {
 
     #[test]
     fn test_get_missing_key() {
-        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let cache: BasicCache<String, i32> = BasicCache::new();
         let value = cache.get(&"vini".to_string());
         assert!(value.is_none())
     }
@@ -58,7 +57,7 @@ mod tests {
 
     #[test]
     fn test_empty_cache() {
-        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let cache: BasicCache<String, i32> = BasicCache::new();
         assert_eq!(cache.len(), 0);
         let value = cache.get(&"vini".to_string());
         assert!(value.is_none())
@@ -94,7 +93,7 @@ mod tests {
     }
     #[test]
     fn test_empty_cache_contains_value() {
-        let mut cache: BasicCache<String, i32> = BasicCache::new();
+        let cache: BasicCache<String, i32> = BasicCache::new();
         let is_contain =  cache.contains_value(&5);
         println!("{:?}", is_contain);
         assert!(!is_contain);
