@@ -48,7 +48,7 @@ where
     where
         F: Fn(&mut V),
     {
-        self.storage.iter_mut().for_each(|(k,v)| f(v));
+        self.storage.iter_mut().for_each(|(_k,v)| f(v));
     }
 }
 
