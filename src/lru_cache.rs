@@ -31,4 +31,18 @@ where
             capacity,
         }
     }
+
+    fn detach(&mut self,index:usize){
+      let prev = self.nodes[index].prev;
+        let next = self.nodes[index].next;
+        match prev {
+           Some(p) => self.nodes[p].next = next,
+           None => self.head = next
+       }
+        match next {
+          Some(n)=>  self.nodes[n].prev = prev,
+           None=> self.tail = prev
+        }
+    }
+
 }
