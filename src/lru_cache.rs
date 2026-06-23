@@ -45,4 +45,17 @@ where
         }
     }
 
+    fn attach_to_head(&mut self,index:usize){
+        if self.nodes.is_empty(){
+            self.head = Some(index);
+            self.tail = Some(index);
+        }else{
+            self.nodes[index].next = self.head;
+            self.nodes[index].prev = None;
+            self.nodes[self.head.unwrap()].prev = Some(index);
+            self.head = Some(index);
+
+        }
+    }
+
 }
