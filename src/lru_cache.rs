@@ -1,15 +1,18 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-struct Node<K,V>{
+use crate::errors::CacheError;
+
+#[derive(Clone)]
+pub struct Node<K,V>{
     prev : Option<usize>,
     next : Option<usize>,
     key:K,
     value:V
 }
 
-struct LruCache<K,V>
+pub struct LruCache<K,V>
 where
-    K: Eq + Hash
+    K: Eq + Hash + Clone
 {
     nodes:Vec<Node<K,V>>,
     map:HashMap<K,usize>,
@@ -18,11 +21,24 @@ where
     capacity:usize
 }
 
-impl<K,V> LruCache<K,V>
+impl<K,V> Node<K,V>
 where
     K: Eq + Hash
 {
-    fn new(capacity:usize) -> Self {
+    fn new(key:K,value:V,prev:Option<usize>,next:Option<usize>) -> Self {
+        Node{
+            prev,
+            next,
+            key,
+            value
+        }
+    }
+}
+impl<K,V> LruCache<K,V>
+where
+    K: Eq + Hash + Clone
+{
+   pub fn new(capacity:usize) -> Self {
         LruCache{
             nodes:Vec::new(),
             map:HashMap::new(),
@@ -32,7 +48,22 @@ where
         }
     }
 
-    fn detach(&mut self,index:usize){
+        fn put(&mut self, key: K, value: V)->Result<(),CacheError> {
+            let index = self.nodes.len();
+            self.map.insert(key.clone(),index);
+            let node:Node<K,V> = Node::new(key,value,prev:None,next:None);
+            self.nodes.push(node);
+            Ok(())
+        }
+         fn get(&mut self,key:K)->Option<&V>{
+             if let Some(index) => self.map.get(key){
+             self.detach(index);
+             }
+
+
+         }
+
+  pub  fn detach(&mut self,index:usize){
       let prev = self.nodes[index].prev;
         let next = self.nodes[index].next;
         match prev {
@@ -45,7 +76,7 @@ where
         }
     }
 
-    fn attach_to_head(&mut self,index:usize){
+  pub  fn attach_to_head(&mut self,index:usize){
         if self.nodes.is_empty(){
             self.head = Some(index);
             self.tail = Some(index);
