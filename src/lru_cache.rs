@@ -50,12 +50,20 @@ where
     }
 
     fn put(&mut self, key: K, value: V) -> Result<(), CacheError> {
-        let index = self.nodes.len();
-        self.map.insert(key.clone(), index);
-        let node: Node<K, V> = Node::new(key, value, None, None);
-        self.nodes.push(node);
-        self.attach_to_head(index);
-        Ok(())
+        if let Some(index) = self.map.get(&key) {
+            let index = *index;
+            self.nodes[index].value = value;
+             self.detach(index);
+            self.attach_to_head(index);
+            Ok(())
+        } else {
+            let index = self.nodes.len();
+            self.map.insert(key.clone(), index);
+            let node: Node<K, V> = Node::new(key, value, None, None);
+            self.nodes.push(node);
+            self.attach_to_head(index);
+            Ok(())
+        }
     }
     fn get(&mut self, key: &K) -> Option<&V> {
         let index = match self.map.get(key) {
@@ -92,3 +100,5 @@ where
         }
     }
 }
+
+
