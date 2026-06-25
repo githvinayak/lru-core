@@ -1,6 +1,7 @@
 use crate::errors::CacheError;
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::path::MAIN_SEPARATOR;
 
 #[derive(Clone)]
 pub struct Node<K, V> {
@@ -53,14 +54,17 @@ where
         self.map.insert(key.clone(), index);
         let node: Node<K, V> = Node::new(key, value, None, None);
         self.nodes.push(node);
+        self.attach_to_head(index);
         Ok(())
     }
-    fn get(&mut self, key: K) -> Option<&V> {
-        let  index = *self.map.get(&key).unwrap();
-        self.detach(index.clone());
-        self.attach_to_head(index.clone());
-         let val = &self.nodes[index.clone()].value;
-        return Some(&val);
+    fn get(&mut self, key: &K) -> Option<&V> {
+        let index = match self.map.get(key) {
+            Some(i) => *i,
+            None => return None,
+        };
+        self.detach(index);
+        self.attach_to_head(index);
+        Some(&self.nodes[index].value)
     }
 
     pub fn detach(&mut self, index: usize) {
