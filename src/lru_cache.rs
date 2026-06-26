@@ -95,10 +95,26 @@ where
         } else {
             self.nodes[index].next = self.head;
             self.nodes[index].prev = None;
-            self.nodes[self.head.unwrap()].prev = Some(index);
+            match  self.head {
+                Some(h)=> self.nodes[h].prev = Some(index),
+                None => return
+            }
             self.head = Some(index);
         }
     }
 }
 
 
+#[cfg(test)]
+
+mod tests{
+    use super::*;
+
+    #[test]
+    fn test_get_and_put(){
+        let mut cache:LruCache<String,i32> = LruCache::new(5);
+        cache.put("vini".to_string(),5);
+        assert_eq!(cache.get(&"vini".to_string()),Some(&5));
+
+    }
+}
