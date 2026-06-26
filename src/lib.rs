@@ -4,7 +4,6 @@ pub mod basic_cache;
 pub mod logging_cache;
 mod lru_cache;
 
-use std::collections::hash_map::Keys;
 use cache::Cache;
 use basic_cache::BasicCache;
 use logging_cache::LoggingCache;
