@@ -19,11 +19,11 @@ mod tests{
         cache.put(String::from("three"), 3).unwrap();
         cache.put(String::from("four"), 4).unwrap();
         cache.put(String::from("five"), 5).unwrap();
-        cache.remove(&"one".to_string());
-        cache.remove(&"two".to_string());
-        cache.remove(&"three".to_string());
-        cache.remove(&"four".to_string());
-        cache.remove(&"five".to_string());
+        let _ = cache.remove(&"one".to_string());
+        let _ =cache.remove(&"two".to_string());
+        let _ =cache.remove(&"three".to_string());
+        let _ =cache.remove(&"four".to_string());
+        let _ = cache.remove(&"five".to_string());
         assert!(cache.is_empty());
     }
 
