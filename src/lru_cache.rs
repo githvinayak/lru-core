@@ -190,4 +190,29 @@ mod tests{
         let _ = cache.put("c".to_string(),3);
         assert!(!cache.map.contains_key("b"));
 }
+    #[test]
+    fn test_get_on_empty_cache(){
+        let mut cache:LruCache<String,i32> = LruCache::new(2);
+        cache.get(&"a".to_string());
+        assert!(cache.head.is_none());
+    }
+    #[test]
+    fn test_single_element(){
+        let mut cache:LruCache<String,i32> = LruCache::new(1);
+        let _ =cache.put("a".to_string(),5);
+        cache.get(&"a".to_string());
+        let head_idx = cache.head;
+        let tail_idx = cache.tail;
+        assert_eq!(cache.nodes[head_idx.unwrap()].key,"a");
+        assert_eq!(cache.nodes[tail_idx.unwrap()].key,"a");
+    }
+
+    #[test]
+    fn test_repeated_evictions(){
+        let mut cache:LruCache<String,i32> = LruCache::new(1);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),5);
+        let _ =cache.put("c".to_string(),5);
+        assert_eq!(cache.nodes.len(),1)
+    }
 }
