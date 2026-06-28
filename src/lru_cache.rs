@@ -57,13 +57,9 @@ where
             Ok(())
         } else {
             let index = self.nodes.len();
-            println!("index: {}, capacity: {}", index, self.capacity);
             if index == self.capacity{
-                println!("tail: {:?}", self.tail);
                 match self.tail {
                     Some(t) => {
-                        println!("evicting index: {}", t);
-                        println!("tail key: {:?}", self.nodes[t].key);
                         let evict_key = self.nodes[t].key.clone();
                         self.detach(t);
                        self.map.remove(&evict_key);
@@ -154,7 +150,6 @@ mod tests{
         let _ = cache.put("c".to_string(),3);
         cache.get(&"a".to_string());
         cache.get(&"b".to_string());
-        println!("{:?}", cache.nodes);
         let head_idx = cache.head;
         let mid_idx = cache.nodes[head_idx.unwrap()].next;
         let tail_idx = cache.tail;
