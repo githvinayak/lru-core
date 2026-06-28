@@ -2,7 +2,7 @@ use crate::errors::CacheError;
 use std::collections::HashMap;
 use std::hash::Hash;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Node<K, V> {
     prev: Option<usize>,
     next: Option<usize>,
@@ -143,8 +143,51 @@ mod tests{
         let _ =cache.put("b".to_string(),4);
         let _ = cache.put("c".to_string(),3);
         let _ = cache.put("d".to_string(),2);
-        println!("{:?}", cache.map);
         assert!(!cache.map.contains_key(&"a".to_string()));
         assert!(cache.map.contains_key(&"d".to_string()));
     }
+    #[test]
+    fn test_recency_order(){
+        let mut cache:LruCache<String,i32> = LruCache::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        let _ = cache.put("c".to_string(),3);
+        cache.get(&"a".to_string());
+        cache.get(&"b".to_string());
+        println!("{:?}", cache.nodes);
+        let head_idx = cache.head;
+        let mid_idx = cache.nodes[head_idx.unwrap()].next;
+        let tail_idx = cache.tail;
+
+        assert_eq!(cache.nodes[head_idx.unwrap()].key,"b");
+        assert_eq!(cache.nodes[mid_idx.unwrap()].key,"a");
+        assert_eq!(cache.nodes[tail_idx.unwrap()].key,"c");
+    }
+
+    #[test]
+    fn test_capacity_one(){
+        let mut cache:LruCache<String,i32> = LruCache::new(1);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        assert_eq!(cache.head,cache.tail);
+        assert!(!cache.map.contains_key("a"));
+        assert!(cache.map.contains_key("b"))
+    }
+
+    #[test]
+    fn repeated_keys(){
+        let mut cache:LruCache<String,i32> = LruCache::new(5);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("a".to_string(),4);
+        assert_eq!(cache.nodes.len(),1)
+}
+    #[test]
+    fn eviction_updates_order(){
+        let mut cache:LruCache<String,i32> = LruCache::new(2);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        cache.get(&"a".to_string());
+        let _ = cache.put("c".to_string(),3);
+        assert!(!cache.map.contains_key("b"));
+}
 }
