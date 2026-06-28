@@ -3,6 +3,7 @@ pub mod cache;
 pub mod basic_cache;
 pub mod logging_cache;
 pub mod lru_cache;
+mod lru_cache_rc;
 
 pub use cache::Cache;
 pub use basic_cache::BasicCache;
