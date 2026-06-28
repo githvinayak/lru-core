@@ -2,11 +2,11 @@ pub mod errors;
 pub mod cache;
 pub mod basic_cache;
 pub mod logging_cache;
-mod lru_cache;
+pub mod lru_cache;
 
-use cache::Cache;
-use basic_cache::BasicCache;
-use logging_cache::LoggingCache;
+pub use cache::Cache;
+pub use basic_cache::BasicCache;
+pub use logging_cache::LoggingCache;
 use errors::CacheError;
 
 #[cfg(test)]
