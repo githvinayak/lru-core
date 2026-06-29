@@ -33,4 +33,30 @@ where
             capacity,
         }
     }
+
+        pub fn detach(&mut self, node: NodePtr<K,V>) {
+            let prev = node.borrow_mut().prev.clone();
+            let next = node.borrow_mut().next.clone();
+            match prev.clone() {
+                Some(p) => p.borrow_mut().next = next.clone(),
+                None => self.head = next.clone(),
+            }
+            match next {
+                Some(n) => n.borrow_mut().prev = prev,
+                None => self.tail = prev,
+            }
+        }
+    pub fn attach_to_head(&mut self, node: NodePtr<K,V>) {
+        if self.head.is_none() {
+            self.head = Some(node.clone());
+            self.tail = Some(node.clone());
+        } else {
+            node.borrow_mut().next = self.head.clone();
+           node.borrow_mut().prev = None;
+            if let Some(old_head) = self.head.clone() {
+               old_head.borrow_mut().prev  = Some(node.clone())
+            }
+            self.head = Some(node);
+        }
+    }
 }
