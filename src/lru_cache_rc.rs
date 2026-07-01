@@ -107,3 +107,18 @@ where
     }
 }
 
+
+
+#[cfg(test)]
+
+mod tests{
+    use crate::lru_cache::LruCache;
+    use super::*;
+
+    #[test]
+    fn test_get_and_put(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("vini".to_string(),5);
+        assert_eq!(cache.get(&"vini".to_string()),Some(5));
+    }
+}
