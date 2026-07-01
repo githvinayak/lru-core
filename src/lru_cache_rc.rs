@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::rc::Rc;
+use crate::errors::CacheError;
 
 type NodePtr<K,V> = Rc<RefCell<Node<K,V>>>;
 struct Node<K,V>{
@@ -59,4 +60,50 @@ where
             self.head = Some(node);
         }
     }
+
+    pub fn get(&mut self, key: &K) -> Option<V> {
+        let index = match self.map.get(key) {
+            Some(i) => i.clone(),
+            None => return None,
+        };
+        self.detach(index.clone());
+        self.attach_to_head(index.clone());
+        Some(index.borrow().value.clone())
+    }
+
+    pub fn put(&mut self, key: K, value: V) -> Result<(), CacheError> {
+        if let Some(index) = self.map.get(&key) {
+            let index = index.clone();
+            index.borrow_mut().value = value;
+            self.detach(index.clone());
+            self.attach_to_head(index.clone());
+            Ok(())
+        } else {
+            let index = self.len;
+            if index == self.capacity{
+                match self.tail.clone() {
+                    Some( t) => {
+                        let evict_key = t.borrow().key.clone();
+                        self.detach(t.clone());
+                        self.map.remove(&evict_key);
+                        let node: Node<K, V> = Node{key:key.clone(), value, prev:None, next:None};
+                        let ptr: NodePtr<K,V> = Rc::new(RefCell::new(node));
+                        self.map.insert(key.clone(), ptr.clone());
+                        self.attach_to_head(ptr);
+                        return Ok(());
+                    },
+                    None => ()
+                }
+
+            }
+            let key_to_put = key.clone();
+            let node: Node<K, V> = Node{key:key_to_put, value, prev:None, next:None};
+            let ptr: NodePtr<K,V> = Rc::new(RefCell::new(node));
+            self.map.insert(key.clone(), ptr.clone());
+            self.len += 1;
+            self.attach_to_head(ptr);
+            Ok(())
+        }
+    }
 }
+
