@@ -152,7 +152,7 @@ mod tests{
 
     #[test]
     fn test_capacity_one(){
-        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(1);
         let _ =cache.put("a".to_string(),5);
         let _ =cache.put("b".to_string(),4);
         assert_eq!(cache.head,cache.tail);
@@ -169,7 +169,7 @@ mod tests{
     }
     #[test]
     fn eviction_updates_order(){
-        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(2);
         let _ =cache.put("a".to_string(),5);
         let _ =cache.put("b".to_string(),4);
         cache.get(&"a".to_string());
@@ -194,7 +194,7 @@ mod tests{
 
     #[test]
     fn test_repeated_evictions(){
-        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(1);
         let _ =cache.put("a".to_string(),5);
         let _ =cache.put("b".to_string(),5);
         let _ =cache.put("c".to_string(),5);
