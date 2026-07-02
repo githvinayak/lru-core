@@ -5,20 +5,21 @@ use std::rc::Rc;
 use crate::errors::CacheError;
 
 type NodePtr<K,V> = Rc<RefCell<Node<K,V>>>;
-struct Node<K,V>{
-    prev: Option<NodePtr<K,V>>,
-    next: Option<NodePtr<K,V>>,
-    key: K,
-    value: V,
+#[derive(Debug,PartialEq)]
+pub struct Node<K,V>{
+   pub prev: Option<NodePtr<K,V>>,
+   pub next: Option<NodePtr<K,V>>,
+   pub key: K,
+   pub value: V,
 
 }
 
-struct LruCacheRc<K,V> {
-    head:Option<NodePtr<K,V>>,
-    tail:Option<NodePtr<K,V>>,
-    map:HashMap<K,NodePtr<K,V>>,
-    capacity:usize,
-    len:usize
+pub struct LruCacheRc<K,V> {
+    pub  head:Option<NodePtr<K,V>>,
+    pub tail:Option<NodePtr<K,V>>,
+    pub  map:HashMap<K,NodePtr<K,V>>,
+    pub  capacity:usize,
+    pub len:usize
 }
 
 impl<K, V> LruCacheRc<K, V>
@@ -120,5 +121,83 @@ mod tests{
         let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
         let _ =cache.put("vini".to_string(),5);
         assert_eq!(cache.get(&"vini".to_string()),Some(5));
+    }
+
+    #[test]
+    fn test_eviction(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        let _ = cache.put("c".to_string(),3);
+        let _ = cache.put("d".to_string(),2);
+        assert!(!cache.map.contains_key(&"a".to_string()));
+        assert!(cache.map.contains_key(&"d".to_string()));
+    }
+    #[test]
+    fn test_recency_order(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        let _ = cache.put("c".to_string(),3);
+        cache.get(&"a".to_string());
+        cache.get(&"b".to_string());
+
+        let mid_idx = cache.head.clone().unwrap().borrow().next.clone();
+        let tail_idx = cache.tail;
+
+        assert_eq!(cache.head.unwrap().borrow().key,"b");
+        assert_eq!(mid_idx.unwrap().borrow().key,"a");
+        assert_eq!(tail_idx.unwrap().borrow().key,"c");
+    }
+
+    #[test]
+    fn test_capacity_one(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        assert_eq!(cache.head,cache.tail);
+        assert!(!cache.map.contains_key("a"));
+        assert!(cache.map.contains_key("b"))
+    }
+
+    #[test]
+    fn repeated_keys(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("a".to_string(),4);
+        assert_eq!(cache.len,1)
+    }
+    #[test]
+    fn eviction_updates_order(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),4);
+        cache.get(&"a".to_string());
+        let _ = cache.put("c".to_string(),3);
+        assert!(!cache.map.contains_key("b"));
+    }
+    #[test]
+    fn test_get_on_empty_cache(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        cache.get(&"a".to_string());
+        assert!(cache.head.is_none());
+    }
+    #[test]
+    fn test_single_element(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        cache.get(&"a".to_string());
+
+        assert_eq!(cache.head.unwrap().borrow().key,"a");
+        assert_eq!(cache.tail.unwrap().borrow().key,"a");
+    }
+
+    #[test]
+    fn test_repeated_evictions(){
+        let mut cache:LruCacheRc<String,i32> = LruCacheRc::new(3);
+        let _ =cache.put("a".to_string(),5);
+        let _ =cache.put("b".to_string(),5);
+        let _ =cache.put("c".to_string(),5);
+        assert_eq!(cache.len,1)
     }
 }
