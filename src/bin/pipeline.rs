@@ -4,16 +4,17 @@ use std::time::Instant;
 
 #[tokio::main]
 async fn main() {
-    let (tx,mut rx) = mpsc::channel::<i32>(5);
+    let (tx,mut rx) = mpsc::channel::<i32>(2);
     async fn producer(tx: mpsc::Sender<i32>) {
         for i in 0..5 {
+            println!("before");
             tx.send(i).await.unwrap();
+            println!("after");
             tokio::time::sleep(Duration::from_millis(50)).await;
         }
     }
     async fn consumer(mut rx:  mpsc::Receiver<i32>) {
         for i in 0..5 {
-
             let msg = rx.recv().await.unwrap();
             tokio::time::sleep(Duration::from_millis(100)).await;
             println!("msg: {}", msg);
