@@ -45,10 +45,6 @@ async fn main() {
 
     async fn consumer(mut rx: Arc<Mutex<mpsc::Receiver<i32>>>,mut shutdown_rx: mpsc::Receiver<()>) {
         loop {
-            let msg = {
-                let mut guard = rx.lock().await;
-                guard.recv().await
-            };
             select! {
                  result =  tokio::time::timeout(Duration::from_millis(150),async { rx.lock().await.recv().await })  => {
             match result {
