@@ -18,14 +18,18 @@ async fn main() {
                 }
                 None => break
             }
-            tokio::time::sleep(Duration::from_millis(150)).await;
+            tokio::time::sleep(Duration::from_millis(300)).await;
         }
     }
 
     let task = tokio::spawn(async move {
         let mut stream = tokio_stream::iter(vec![1, 2, 3,4,5,6,7,8,9,10]);
         while let Some(val) = stream.next().await{
+            let start = std::time::Instant::now();
+            println!("sending {} at {:?}", val, start.elapsed());
             tx.send(val).await.unwrap();
+            println!("sent {} at {:?}", val, start.elapsed());
+            tokio::time::sleep(Duration::from_millis(10)).await;
         }
     });
 
