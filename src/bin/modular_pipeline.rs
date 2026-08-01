@@ -7,7 +7,6 @@ use tokio_stream::StreamExt;
 
 
 async fn run_producer(tx:mpsc::Sender<i32>,items:Vec<i32>){
-    let task = tokio::spawn(async move {
         let mut stream = tokio_stream::iter(items);
         while let Some(val) = stream.next().await{
             let start = Instant::now();
@@ -16,10 +15,8 @@ async fn run_producer(tx:mpsc::Sender<i32>,items:Vec<i32>){
             println!("sent {} at {}ms", val, start.elapsed().as_millis());
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
-    });
-}
+ }
 async fn run_worker(id:i32,rx:Arc<Mutex<mpsc::Receiver<i32>>>,start: Arc<Instant>){
-    async fn consumer(id:i32,rx:Arc<Mutex<mpsc::Receiver<i32>>>,start:Arc<Instant>) {
         loop{
             let msg  = rx.lock().await.recv().await;
             println!("worker {} received {:?} at {}ms, processing...",id, msg, start.elapsed().as_millis());
@@ -33,11 +30,6 @@ async fn run_worker(id:i32,rx:Arc<Mutex<mpsc::Receiver<i32>>>,start: Arc<Instant
             }
 
         }
-    }
-
-    let worker = tokio::spawn(async move {
-        consumer(id,rx,start).await;
-    });
 }
 
 async fn run_pipeline(){
