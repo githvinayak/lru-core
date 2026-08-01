@@ -17,18 +17,25 @@ async fn run_producer(tx:mpsc::Sender<i32>,items:Vec<i32>){
         }
  }
 async fn run_worker(id:i32,rx:Arc<Mutex<mpsc::Receiver<i32>>>,start: Arc<Instant>){
+    let mut count:i32 = 0;
         loop{
-            let msg  = rx.lock().await.recv().await;
+           let msg =  match tokio::time::timeout(Duration::from_millis(150),rx.lock().await.recv()).await {
+                 Ok(Some(msg)) =>{
+                     count = count + 1;
+                     msg
+                 }
+               Ok(None) => {
+                   println!("worker {} processed {} messages", id, count);
+                   break;
+               }
+                 Err(_) =>{
+                 println!("timeout");
+                 continue
+                 }
+             };
             println!("worker {} received {:?} at {}ms, processing...",id, msg, start.elapsed().as_millis());
             tokio::time::sleep(Duration::from_millis(300)).await;
             println!("worker {} finished {:?} at {}ms",id, msg, start.elapsed().as_millis());
-            match msg {
-                Some(msg) => {
-                    println!(" msg {}",msg);
-                }
-                None => break
-            }
-
         }
 }
 
@@ -39,7 +46,7 @@ async fn run_pipeline(){
     let start  = Arc::new((Instant::now()));
     let start1 = start.clone();
     let mut handles = Vec::new();
-
+    let startTime = Instant::now();
     handles.push(tokio::spawn(run_producer(tx,vec![1, 2, 3,4,5,6,7,8,9,10])));
     handles.push(tokio::spawn(run_worker(1,rx,start)));
     handles.push(tokio::spawn(run_worker(2,rx1,start1)));
@@ -47,7 +54,7 @@ async fn run_pipeline(){
     for handle in handles{
         handle.await.unwrap();
     }
-
+    println!("total time : {:?}",startTime.elapsed())
 }
 #[tokio::main]
 async fn main() {
