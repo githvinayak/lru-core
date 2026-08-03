@@ -4,6 +4,7 @@ pub mod basic_cache;
 pub mod logging_cache;
 pub mod lru_cache;
 pub mod lru_cache_rc;
+pub mod pipeline;
 
 pub use cache::Cache;
 pub use basic_cache::BasicCache;
